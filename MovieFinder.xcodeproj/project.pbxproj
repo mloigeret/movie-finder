@@ -18,6 +18,13 @@
 		E027F56126A87A2F007DB7B3 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E027F56026A87A2F007DB7B3 /* AppCoordinator.swift */; };
 		E027F56426A87B53007DB7B3 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E027F56326A87B53007DB7B3 /* HomeViewController.swift */; };
 		E027F56726A8A046007DB7B3 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E027F56626A8A046007DB7B3 /* HomeViewModel.swift */; };
+		E027F56A26A8A84E007DB7B3 /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E027F56926A8A84E007DB7B3 /* APIService.swift */; };
+		E027F56C26A8A9CD007DB7B3 /* APIRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E027F56B26A8A9CD007DB7B3 /* APIRequest.swift */; };
+		E027F56F26A8AA78007DB7B3 /* MovieSearchRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E027F56E26A8AA78007DB7B3 /* MovieSearchRequest.swift */; };
+		E027F57126A8ABF3007DB7B3 /* MovieSearchResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = E027F57026A8ABF3007DB7B3 /* MovieSearchResult.swift */; };
+		E027F57326A8B8BC007DB7B3 /* MovieSearchListResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = E027F57226A8B8BC007DB7B3 /* MovieSearchListResult.swift */; };
+		E027F57826A8DBEB007DB7B3 /* ApiKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = E027F57726A8DBEB007DB7B3 /* ApiKey.swift */; };
+		E027F57A26A8DC67007DB7B3 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = E027F57926A8DC67007DB7B3 /* Configuration.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,6 +63,13 @@
 		E027F56026A87A2F007DB7B3 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
 		E027F56326A87B53007DB7B3 /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		E027F56626A8A046007DB7B3 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
+		E027F56926A8A84E007DB7B3 /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
+		E027F56B26A8A9CD007DB7B3 /* APIRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIRequest.swift; sourceTree = "<group>"; };
+		E027F56E26A8AA78007DB7B3 /* MovieSearchRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieSearchRequest.swift; sourceTree = "<group>"; };
+		E027F57026A8ABF3007DB7B3 /* MovieSearchResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieSearchResult.swift; sourceTree = "<group>"; };
+		E027F57226A8B8BC007DB7B3 /* MovieSearchListResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieSearchListResult.swift; sourceTree = "<group>"; };
+		E027F57726A8DBEB007DB7B3 /* ApiKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiKey.swift; sourceTree = "<group>"; };
+		E027F57926A8DC67007DB7B3 /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
 		EFDCBF93E707681D0D432085 /* Pods_MovieFinder.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MovieFinder.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -121,7 +135,10 @@
 			children = (
 				E027F52C26A87768007DB7B3 /* AppDelegate.swift */,
 				E027F52E26A87768007DB7B3 /* SceneDelegate.swift */,
+				E027F57426A8DBA2007DB7B3 /* Configuration */,
 				E027F55C26A878BC007DB7B3 /* Protocols */,
+				E027F56826A8A81E007DB7B3 /* Services */,
+				E027F56D26A8AA58007DB7B3 /* Models */,
 				E027F55F26A879F7007DB7B3 /* Coordinators */,
 				E027F56526A8A015007DB7B3 /* View Models */,
 				E027F56226A87B29007DB7B3 /* View Controllers */,
@@ -154,6 +171,7 @@
 			isa = PBXGroup;
 			children = (
 				E027F55D26A878DF007DB7B3 /* Coordinator.swift */,
+				E027F56B26A8A9CD007DB7B3 /* APIRequest.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -180,6 +198,33 @@
 				E027F56626A8A046007DB7B3 /* HomeViewModel.swift */,
 			);
 			path = "View Models";
+			sourceTree = "<group>";
+		};
+		E027F56826A8A81E007DB7B3 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				E027F56926A8A84E007DB7B3 /* APIService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		E027F56D26A8AA58007DB7B3 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				E027F56E26A8AA78007DB7B3 /* MovieSearchRequest.swift */,
+				E027F57026A8ABF3007DB7B3 /* MovieSearchResult.swift */,
+				E027F57226A8B8BC007DB7B3 /* MovieSearchListResult.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		E027F57426A8DBA2007DB7B3 /* Configuration */ = {
+			isa = PBXGroup;
+			children = (
+				E027F57726A8DBEB007DB7B3 /* ApiKey.swift */,
+				E027F57926A8DC67007DB7B3 /* Configuration.swift */,
+			);
+			path = Configuration;
 			sourceTree = "<group>";
 		};
 		FBD082499AE88E5CD67EFED5 /* Frameworks */ = {
@@ -363,11 +408,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E027F57326A8B8BC007DB7B3 /* MovieSearchListResult.swift in Sources */,
 				E027F56426A87B53007DB7B3 /* HomeViewController.swift in Sources */,
+				E027F57826A8DBEB007DB7B3 /* ApiKey.swift in Sources */,
+				E027F56F26A8AA78007DB7B3 /* MovieSearchRequest.swift in Sources */,
+				E027F56A26A8A84E007DB7B3 /* APIService.swift in Sources */,
+				E027F57126A8ABF3007DB7B3 /* MovieSearchResult.swift in Sources */,
 				E027F56726A8A046007DB7B3 /* HomeViewModel.swift in Sources */,
+				E027F57A26A8DC67007DB7B3 /* Configuration.swift in Sources */,
 				E027F56126A87A2F007DB7B3 /* AppCoordinator.swift in Sources */,
 				E027F52D26A87768007DB7B3 /* AppDelegate.swift in Sources */,
 				E027F52F26A87768007DB7B3 /* SceneDelegate.swift in Sources */,
+				E027F56C26A8A9CD007DB7B3 /* APIRequest.swift in Sources */,
 				E027F55E26A878DF007DB7B3 /* Coordinator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

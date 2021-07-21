@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 protocol HomeViewControllerProtocol: UIViewController {
 }
@@ -23,6 +25,7 @@ class HomeViewController: UIViewController, HomeViewControllerProtocol {
     }()
     private let _tableView = UITableView()
     private let _homeViewModel : HomeViewModelProtocol
+    private let _disposeBag = DisposeBag()
     
     static func instantiate(viewModel: HomeViewModelProtocol) -> HomeViewControllerProtocol {
         return HomeViewController(viewModel: viewModel)
@@ -41,6 +44,8 @@ class HomeViewController: UIViewController, HomeViewControllerProtocol {
         super.viewDidLoad()
         configureProperties()
         configureLayout()
+        configureSearch()
+        configureObservers()
     }
     
     private func configureProperties() {
@@ -67,6 +72,21 @@ class HomeViewController: UIViewController, HomeViewControllerProtocol {
             _tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
         _tableView.contentInset.bottom = view.safeAreaInsets.bottom
+    }
+    
+    private func configureSearch() {
+        _searchController.searchBar.rx.text.asObservable()
+            .map { ($0 ?? "").lowercased() }
+            .bind(to: _homeViewModel.searchObserver)
+            .disposed(by: _disposeBag)
+    }
+    
+    private func configureObservers() {
+        _homeViewModel.content.drive(_tableView.rx.items(cellIdentifier: Constants.cellIdentifier)) {
+            (index, movie: MovieSearchResult, cell) in
+            cell.textLabel?.text = movie.title
+        }
+        .disposed(by: _disposeBag)
     }
     
 }
