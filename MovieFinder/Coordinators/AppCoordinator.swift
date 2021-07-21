@@ -22,7 +22,8 @@ class AppCoordinator: AppCordinatorProtocol {
     }
     
     func start() {
-        let homeViewController = HomeViewController.instantiate()
+        let homeViewModel = HomeViewModel.instantiate()
+        let homeViewController = HomeViewController.instantiate(viewModel: homeViewModel)
         let navigationController = UINavigationController(rootViewController: homeViewController)
         _window.rootViewController = navigationController
         _window.makeKeyAndVisible()
