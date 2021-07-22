@@ -10,4 +10,5 @@ import Foundation
 struct MovieSearchResult: Codable {
     let title: String
     let overview: String
+    let posterPath: String?
 }

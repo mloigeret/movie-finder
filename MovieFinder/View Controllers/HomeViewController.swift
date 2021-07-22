@@ -54,8 +54,11 @@ class HomeViewController: UIViewController, HomeViewControllerProtocol {
         navigationController?.navigationBar.prefersLargeTitles = true
         
         //table view
-        _tableView.register(UITableViewCell.self,
+        _tableView.register(MovieTableViewCell.self,
                             forCellReuseIdentifier: Constants.cellIdentifier)
+        
+        _tableView.rx.setDelegate(self)
+            .disposed(by: _disposeBag)
         
         //search
         navigationItem.searchController = _searchController
@@ -83,10 +86,15 @@ class HomeViewController: UIViewController, HomeViewControllerProtocol {
     
     private func configureObservers() {
         _homeViewModel.content.drive(_tableView.rx.items(cellIdentifier: Constants.cellIdentifier)) {
-            (index, movie: MovieSearchResult, cell) in
-            cell.textLabel?.text = movie.title
+            (index, model: MovieCellModel, cell: MovieTableViewCell) in
+            cell.configure(model: model)
         }
         .disposed(by: _disposeBag)
     }
-    
+}
+
+extension HomeViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 85
+    }
 }

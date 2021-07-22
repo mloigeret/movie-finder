@@ -11,12 +11,10 @@ import RxCocoa
 
 protocol HomeViewModelProtocol {
     var searchObserver: AnyObserver<String> { get }
-    var content: Driver<[MovieSearchResult]> { get }
+    var content: Driver<[MovieCellModel]> { get }
 }
 
 class HomeViewModel: HomeViewModelProtocol {
-    
-    
     private let _apiService = APIService()
     private let _disposeBag = DisposeBag()
     
@@ -25,8 +23,8 @@ class HomeViewModel: HomeViewModelProtocol {
         return _searchSubject.asObserver()
     }
     
-    private let _contentSubject = PublishSubject<[MovieSearchResult]>()
-    var content: Driver<[MovieSearchResult]> {
+    private let _contentSubject = PublishSubject<[MovieCellModel]>()
+    var content: Driver<[MovieCellModel]> {
         return _contentSubject
             .asDriver(onErrorJustReturn: [])
     }
@@ -46,16 +44,23 @@ class HomeViewModel: HomeViewModelProtocol {
                 let request = MovieSearchRequest(query: text)
                 return _apiService.send(apiRequest: request)
             }
-            
             .subscribe(onNext: { [unowned self] searchResult in
-                
-                for movie in searchResult.results {
-                    print(movie.title)
+                let movieCellModels = searchResult.results.map {
+                    return MovieCellModel(title: $0.title,
+                                          overview: $0.overview,
+                                          color: .yellow,
+                                          imageURL: getImageURL(path: $0.posterPath))
                 }
-                
-                self._contentSubject.onNext(searchResult.results)
+                self._contentSubject.onNext(movieCellModels)
             })
             .disposed(by: _disposeBag)
     }
-
+    
+    private func getImageURL(path: String?) -> URL? {
+        if let path = path,
+           let url = URL(string: Configuration.tmdb.imgBaseUrl + path) {
+            return url
+        }
+        return nil
+    }
 }

@@ -26,7 +26,9 @@ class APIService: APIServiceProtocol {
         let request = apiRequest.request(with: Constants.baseURL)
         return URLSession.shared.rx.data(request: request)
             .map { data in
-                try JSONDecoder().decode(T.self, from: data)
+                let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                return try decoder.decode(T.self, from: data)
             }
             .observe(on: MainScheduler.asyncInstance)
     }

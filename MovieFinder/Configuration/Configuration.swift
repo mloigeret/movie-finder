@@ -11,5 +11,6 @@ struct Configuration {
     struct tmdb {
         static let apiKey = ApiKey.tmdb
         static let baseUrl = "https://api.themoviedb.org/3"
+        static let imgBaseUrl = "https://image.tmdb.org/t/p/w500"
     }
 }
