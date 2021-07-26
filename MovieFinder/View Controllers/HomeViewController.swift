@@ -21,6 +21,7 @@ class HomeViewController: UIViewController, HomeViewControllerProtocol {
     private let _searchController: UISearchController = {
         let searchController = UISearchController(searchResultsController: nil)
         searchController.searchBar.placeholder = "Search for movies"
+        searchController.obscuresBackgroundDuringPresentation = false
         return searchController
     }()
     
