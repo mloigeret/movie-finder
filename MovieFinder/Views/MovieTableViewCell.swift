@@ -66,10 +66,10 @@ class MovieTableViewCell: UITableViewCell {
     func configure(model: MovieCellModel) {
         _titleLabel.text = model.title
         _overviewLabel.text = model.overview
-        if let url = model.imageURL {
-            _posterImv.downloadImageFrom(url: url,
-                                         imageMode: .scaleAspectFill)
-        }
+//        if let url = model.imageURL {
+//            _posterImv.downloadImageFrom(url: url,
+//                                         imageMode: .scaleAspectFill)
+//        }
         backgroundColor = model.color
     }
 }

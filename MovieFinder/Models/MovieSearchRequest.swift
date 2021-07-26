@@ -12,8 +12,9 @@ class MovieSearchRequest: APIRequest {
     var path = "search/movie"
     var parameters = [String: String]()
     
-    init(query: String) {
+    init(query: String, page: Int) {
         parameters["query"] = query
         parameters["api_key"] = Configuration.tmdb.apiKey
+        parameters["page"] = String(page)
     }
 }

@@ -23,10 +23,19 @@ class HomeViewController: UIViewController, HomeViewControllerProtocol {
         searchController.searchBar.placeholder = "Search for movies"
         return searchController
     }()
-    private let _tableView = UITableView()
+    
+    private let _tableView: UITableView = {
+        let tableView = UITableView()
+        tableView.register(MovieTableViewCell.self,
+                           forCellReuseIdentifier: Constants.cellIdentifier)
+        tableView.rowHeight = 85
+        return tableView
+        
+    }()
+    
     private let _homeViewModel : HomeViewModelProtocol
     private let _disposeBag = DisposeBag()
-    
+
     static func instantiate(viewModel: HomeViewModelProtocol) -> HomeViewControllerProtocol {
         return HomeViewController(viewModel: viewModel)
     }
@@ -53,13 +62,6 @@ class HomeViewController: UIViewController, HomeViewControllerProtocol {
         navigationItem.title = "Movie Finder"
         navigationController?.navigationBar.prefersLargeTitles = true
         
-        //table view
-        _tableView.register(MovieTableViewCell.self,
-                            forCellReuseIdentifier: Constants.cellIdentifier)
-        
-        _tableView.rx.setDelegate(self)
-            .disposed(by: _disposeBag)
-        
         //search
         navigationItem.searchController = _searchController
         navigationItem.hidesSearchBarWhenScrolling = false
@@ -82,19 +84,20 @@ class HomeViewController: UIViewController, HomeViewControllerProtocol {
             .map { ($0 ?? "").lowercased() }
             .bind(to: _homeViewModel.searchObserver)
             .disposed(by: _disposeBag)
+        
+        _tableView.rx.willDisplayCell
+            .flatMap({ cell, indexPath -> Observable<Int> in
+                return Observable.just(indexPath.row)
+            })
+            .bind(to: _homeViewModel.willDisplayItemObserver)
+            .disposed(by: _disposeBag)
     }
     
     private func configureObservers() {
-        _homeViewModel.content.drive(_tableView.rx.items(cellIdentifier: Constants.cellIdentifier)) {
+        _homeViewModel.contentDriver.drive(_tableView.rx.items(cellIdentifier: Constants.cellIdentifier)) {
             (index, model: MovieCellModel, cell: MovieTableViewCell) in
             cell.configure(model: model)
         }
         .disposed(by: _disposeBag)
-    }
-}
-
-extension HomeViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 85
     }
 }
