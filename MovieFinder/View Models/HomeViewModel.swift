@@ -20,6 +20,7 @@ class HomeViewModel: HomeViewModelProtocol {
     
     private var _lastSearchedText: String? = nil
     private var _currentPage = 1
+    private var _couldFetchMoreResults = true
     
     private let _apiService = APIService()
     private let _disposeBag = DisposeBag()
@@ -57,9 +58,11 @@ class HomeViewModel: HomeViewModelProtocol {
             .distinctUntilChanged()
             .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
             .flatMapLatest { [unowned self] text -> Observable<MovieSearchListResult> in
-                self._isLoadingRelay.accept(true)
-                self._lastSearchedText = text
-                self._currentPage = 1
+                _isLoadingRelay.accept(true)
+                _lastSearchedText = text
+                _currentPage = 1
+                _couldFetchMoreResults = true
+                
                 let request = MovieSearchRequest(query: text, page: self._currentPage)
                 return _apiService.send(apiRequest: request)
             }
@@ -72,13 +75,24 @@ class HomeViewModel: HomeViewModelProtocol {
             })
             .disposed(by: _disposeBag)
         
+        _searchSubject
+            .asObservable()
+            .filter { $0.isEmpty }
+            .subscribe(onNext: { [unowned self] _ in
+                self._contentRelay.accept([])
+                self._isLoadingRelay.accept(false)
+            })
+            .disposed(by: _disposeBag)
+
+        
         _willDisplayItemSubject
             .distinctUntilChanged()
             .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
             .filter { [unowned self] itemIndex in
                 _isLoadingRelay.value == false &&
                     itemIndex >= _contentRelay.value.count-5 &&
-                    !(self._lastSearchedText?.isEmpty ?? false) // may be use an observable instead
+                    !(self._lastSearchedText?.isEmpty ?? false) && // may be use an observable instead
+                    _couldFetchMoreResults
             }
             .flatMapLatest { [unowned self] _ -> Observable<MovieSearchListResult> in
                 _isLoadingRelay.accept(true)
@@ -87,6 +101,10 @@ class HomeViewModel: HomeViewModelProtocol {
                 return _apiService.send(apiRequest: request)
             }
             .subscribe(onNext: { [unowned self] searchResult in
+                if searchResult.results.count == 0 {
+                    print("end of results")
+                    _couldFetchMoreResults = false
+                }
                 let movieCellModels = searchResult.results.map {
                     return MovieCellModel(movieSearchResult: $0)
                 }

@@ -64,12 +64,20 @@ class MovieTableViewCell: UITableViewCell {
     }
     
     func configure(model: MovieCellModel) {
+        let placeholderImage = UIImage(systemName: "film")?.withRenderingMode(.alwaysTemplate)
         _titleLabel.text = model.title
         _overviewLabel.text = model.overview
-//        if let url = model.imageURL {
-//            _posterImv.downloadImageFrom(url: url,
-//                                         imageMode: .scaleAspectFill)
-//        }
+        _posterImv.tintColor = .white
+        _posterImv.contentMode = .scaleAspectFit
+        
+        if let url = model.imageURL {
+            _posterImv.downloadImageFrom(url: url,
+                                         placeholder: placeholderImage,
+                                         imageMode: .scaleAspectFit)
+        }
+        else {
+            _posterImv.image = placeholderImage
+        }
         backgroundColor = model.color
     }
 }

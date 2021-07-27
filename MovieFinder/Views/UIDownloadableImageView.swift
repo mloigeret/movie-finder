@@ -11,13 +11,20 @@ class UIDownloadableImageView: UIImageView {
     let imageCache = NSCache<NSString, AnyObject>()
     var imageURLString: String?
 
-    func downloadImageFrom(urlString: String?, imageMode: UIView.ContentMode) {
+    func downloadImageFrom(urlString: String?,
+                           placeholder: UIImage?,
+                           imageMode: UIView.ContentMode) {
         guard let urlString = urlString,
               let url = URL(string: urlString) else { return }
-        downloadImageFrom(url: url, imageMode: imageMode)
+        downloadImageFrom(url: url,
+                          placeholder: placeholder,
+                          imageMode: imageMode)
     }
 
-    func downloadImageFrom(url: URL, imageMode: UIView.ContentMode) {
+    func downloadImageFrom(url: URL,
+                           placeholder: UIImage?,
+                           imageMode: UIView.ContentMode) {
+        image = placeholder
         contentMode = imageMode
         if let cachedImage = imageCache.object(forKey: url.absoluteString as NSString) as? UIImage {
             self.image = cachedImage
