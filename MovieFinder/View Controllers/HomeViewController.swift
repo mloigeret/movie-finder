@@ -21,6 +21,7 @@ class HomeViewController: UIViewController, HomeViewControllerProtocol {
     private let _searchController: UISearchController = {
         let searchController = UISearchController(searchResultsController: nil)
         searchController.searchBar.placeholder = "Search for movies"
+        searchController.searchBar.returnKeyType = .done
         searchController.obscuresBackgroundDuringPresentation = false
         return searchController
     }()
@@ -30,6 +31,7 @@ class HomeViewController: UIViewController, HomeViewControllerProtocol {
         tableView.register(MovieTableViewCell.self,
                            forCellReuseIdentifier: Constants.cellIdentifier)
         tableView.rowHeight = 85
+        tableView.keyboardDismissMode = .onDrag
         return tableView
         
     }()

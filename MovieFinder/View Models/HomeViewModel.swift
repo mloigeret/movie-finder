@@ -84,7 +84,6 @@ class HomeViewModel: HomeViewModelProtocol {
             })
             .disposed(by: _disposeBag)
 
-        
         _willDisplayItemSubject
             .asObservable()
             .distinctUntilChanged()
