@@ -86,8 +86,8 @@ class HomeViewModel: HomeViewModelProtocol {
 
         
         _willDisplayItemSubject
+            .asObservable()
             .distinctUntilChanged()
-            .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
             .filter { [unowned self] itemIndex in
                 _isLoadingRelay.value == false &&
                     itemIndex >= _contentRelay.value.count-5 &&
