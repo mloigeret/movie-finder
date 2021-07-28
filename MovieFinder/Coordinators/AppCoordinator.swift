@@ -6,12 +6,14 @@
 //
 
 import UIKit
+import RxSwift
 
 protocol AppCordinatorProtocol: Coordinator {
 }
 
 class AppCoordinator: AppCordinatorProtocol {
     private let _window: UIWindow
+    private let _disposeBag = DisposeBag()
     
     static func instantiate(window: UIWindow) -> AppCordinatorProtocol {
         return AppCoordinator(window: window)
@@ -23,10 +25,21 @@ class AppCoordinator: AppCordinatorProtocol {
     
     func start() {
         let homeViewModel = HomeViewModel.instantiate()
+        homeViewModel.requestDetailsObservable
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [unowned self] movieSearchResult in
+                showDetailsViewController(movieSearchResult: movieSearchResult)
+            })
+            .disposed(by: _disposeBag)
         let homeViewController = HomeViewController.instantiate(viewModel: homeViewModel)
         let navigationController = UINavigationController(rootViewController: homeViewController)
         navigationController.view.backgroundColor = .white
         _window.rootViewController = navigationController
         _window.makeKeyAndVisible() 
+    }
+    
+    private func showDetailsViewController(movieSearchResult: MovieSearchResult) {
+        print("alright I guess I will show the details for movie \(movieSearchResult.title)")
+        //continue here
     }
 }

@@ -82,11 +82,26 @@ class HomeViewController: UIViewController, HomeViewControllerProtocol {
             .bind(to: _homeViewModel.searchObserver)
             .disposed(by: _disposeBag)
         
+        _searchController.searchBar.rx.text.asObservable()
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [unowned self] _ in
+                _tableView.setContentOffset(.zero, animated: true)
+            })
+            .disposed(by: _disposeBag)
+        
         _tableView.rx.willDisplayCell
             .flatMap({ cell, indexPath -> Observable<Int> in
                 return Observable.just(indexPath.row)
             })
             .bind(to: _homeViewModel.willDisplayItemObserver)
+            .disposed(by: _disposeBag)
+        
+        _tableView.rx.itemSelected
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [unowned self] indexPath in
+                _tableView.cellForRow(at: indexPath)?.isSelected = false
+                _homeViewModel.didSelectItemObserver.onNext(indexPath.row)
+            })
             .disposed(by: _disposeBag)
         
         _homeViewModel.isLoadingDriver

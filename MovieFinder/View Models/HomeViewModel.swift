@@ -14,6 +14,8 @@ protocol HomeViewModelProtocol {
     var contentDriver: Driver<[MovieSearchResult]> { get }
     var isLoadingDriver: Driver<Bool> { get }
     var willDisplayItemObserver: AnyObserver<Int> { get }
+    var didSelectItemObserver: AnyObserver<Int> { get }
+    var requestDetailsObservable: Observable<MovieSearchResult> { get }
 }
 
 class HomeViewModel: HomeViewModelProtocol {
@@ -45,6 +47,16 @@ class HomeViewModel: HomeViewModelProtocol {
     private let _willDisplayItemSubject = PublishSubject<Int>()
     var willDisplayItemObserver: AnyObserver<Int> {
         return _willDisplayItemSubject.asObserver()
+    }
+    
+    private let _didSelectItemSubject = PublishSubject<Int>()
+    var didSelectItemObserver: AnyObserver<Int> {
+        return _didSelectItemSubject.asObserver()
+    }
+    
+    private let _requestDetails = PublishSubject<MovieSearchResult>()
+    var requestDetailsObservable: Observable<MovieSearchResult> {
+        return _requestDetails.asObservable()
     }
     
     static func instantiate() -> HomeViewModelProtocol {
@@ -103,6 +115,14 @@ class HomeViewModel: HomeViewModelProtocol {
                 self._contentRelay.accept(self._contentRelay.value + searchResult.results)
                 self._isLoadingRelay.accept(false)
             })
+            .disposed(by: _disposeBag)
+        
+        _didSelectItemSubject
+            .asObservable()
+            .flatMapLatest { [unowned self] index -> Observable<MovieSearchResult> in
+                return Observable.of(_contentRelay.value[index])
+            }
+            .bind(to: _requestDetails)
             .disposed(by: _disposeBag)
     }
 }
