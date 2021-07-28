@@ -11,7 +11,7 @@ import RxCocoa
 
 protocol HomeViewModelProtocol {
     var searchObserver: AnyObserver<String> { get }
-    var contentDriver: Driver<[MovieCellModel]> { get }
+    var contentDriver: Driver<[MovieSearchResult]> { get }
     var isLoadingDriver: Driver<Bool> { get }
     var willDisplayItemObserver: AnyObserver<Int> { get }
 }
@@ -30,8 +30,8 @@ class HomeViewModel: HomeViewModelProtocol {
         return _searchSubject.asObserver()
     }
 
-    private let _contentRelay = BehaviorRelay<[MovieCellModel]>(value: [])
-    var contentDriver: Driver<[MovieCellModel]> {
+    private let _contentRelay = BehaviorRelay<[MovieSearchResult]>(value: [])
+    var contentDriver: Driver<[MovieSearchResult]> {
         return _contentRelay
             .asDriver(onErrorJustReturn: [])
     }
@@ -67,10 +67,7 @@ class HomeViewModel: HomeViewModelProtocol {
                 return _apiService.send(apiRequest: request)
             }
             .subscribe(onNext: { [unowned self] searchResult in
-                let movieCellModels = searchResult.results.map {
-                    return MovieCellModel(movieSearchResult: $0)
-                }
-                self._contentRelay.accept(movieCellModels)
+                self._contentRelay.accept(searchResult.results)
                 self._isLoadingRelay.accept(false)
             })
             .disposed(by: _disposeBag)
@@ -101,13 +98,9 @@ class HomeViewModel: HomeViewModelProtocol {
             }
             .subscribe(onNext: { [unowned self] searchResult in
                 if searchResult.results.count == 0 {
-                    print("end of results")
                     _couldFetchMoreResults = false
                 }
-                let movieCellModels = searchResult.results.map {
-                    return MovieCellModel(movieSearchResult: $0)
-                }
-                self._contentRelay.accept(self._contentRelay.value + movieCellModels)
+                self._contentRelay.accept(self._contentRelay.value + searchResult.results)
                 self._isLoadingRelay.accept(false)
             })
             .disposed(by: _disposeBag)

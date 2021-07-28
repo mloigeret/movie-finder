@@ -26,8 +26,8 @@
 		E027F57826A8DBEB007DB7B3 /* ApiKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = E027F57726A8DBEB007DB7B3 /* ApiKey.swift */; };
 		E027F57A26A8DC67007DB7B3 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = E027F57926A8DC67007DB7B3 /* Configuration.swift */; };
 		E027F57D26A9AC1F007DB7B3 /* MovieTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E027F57C26A9AC1F007DB7B3 /* MovieTableViewCell.swift */; };
-		E027F57F26A9ADFD007DB7B3 /* MovieCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E027F57E26A9ADFD007DB7B3 /* MovieCellModel.swift */; };
 		E027F58126A9E546007DB7B3 /* UIDownloadableImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E027F58026A9E546007DB7B3 /* UIDownloadableImageView.swift */; };
+		E087D40C26B1EBC800DE3298 /* UISearchBar+Loading.swift in Sources */ = {isa = PBXBuildFile; fileRef = E087D40B26B1EBC800DE3298 /* UISearchBar+Loading.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -74,8 +74,8 @@
 		E027F57726A8DBEB007DB7B3 /* ApiKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiKey.swift; sourceTree = "<group>"; };
 		E027F57926A8DC67007DB7B3 /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
 		E027F57C26A9AC1F007DB7B3 /* MovieTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieTableViewCell.swift; sourceTree = "<group>"; };
-		E027F57E26A9ADFD007DB7B3 /* MovieCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieCellModel.swift; sourceTree = "<group>"; };
 		E027F58026A9E546007DB7B3 /* UIDownloadableImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIDownloadableImageView.swift; sourceTree = "<group>"; };
+		E087D40B26B1EBC800DE3298 /* UISearchBar+Loading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UISearchBar+Loading.swift"; sourceTree = "<group>"; };
 		EFDCBF93E707681D0D432085 /* Pods_MovieFinder.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MovieFinder.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -143,6 +143,7 @@
 				E027F52E26A87768007DB7B3 /* SceneDelegate.swift */,
 				E027F57426A8DBA2007DB7B3 /* Configuration */,
 				E027F55C26A878BC007DB7B3 /* Protocols */,
+				E087D40A26B1EBAC00DE3298 /* Extensions */,
 				E027F56826A8A81E007DB7B3 /* Services */,
 				E027F56D26A8AA58007DB7B3 /* Models */,
 				E027F55F26A879F7007DB7B3 /* Coordinators */,
@@ -203,7 +204,6 @@
 			isa = PBXGroup;
 			children = (
 				E027F56626A8A046007DB7B3 /* HomeViewModel.swift */,
-				E027F57E26A9ADFD007DB7B3 /* MovieCellModel.swift */,
 			);
 			path = "View Models";
 			sourceTree = "<group>";
@@ -242,6 +242,14 @@
 				E027F58026A9E546007DB7B3 /* UIDownloadableImageView.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		E087D40A26B1EBAC00DE3298 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				E087D40B26B1EBC800DE3298 /* UISearchBar+Loading.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 		FBD082499AE88E5CD67EFED5 /* Frameworks */ = {
@@ -431,13 +439,13 @@
 				E027F57D26A9AC1F007DB7B3 /* MovieTableViewCell.swift in Sources */,
 				E027F57826A8DBEB007DB7B3 /* ApiKey.swift in Sources */,
 				E027F56F26A8AA78007DB7B3 /* MovieSearchRequest.swift in Sources */,
+				E087D40C26B1EBC800DE3298 /* UISearchBar+Loading.swift in Sources */,
 				E027F56A26A8A84E007DB7B3 /* APIService.swift in Sources */,
 				E027F57126A8ABF3007DB7B3 /* MovieSearchResult.swift in Sources */,
 				E027F56726A8A046007DB7B3 /* HomeViewModel.swift in Sources */,
 				E027F57A26A8DC67007DB7B3 /* Configuration.swift in Sources */,
 				E027F56126A87A2F007DB7B3 /* AppCoordinator.swift in Sources */,
 				E027F52D26A87768007DB7B3 /* AppDelegate.swift in Sources */,
-				E027F57F26A9ADFD007DB7B3 /* MovieCellModel.swift in Sources */,
 				E027F52F26A87768007DB7B3 /* SceneDelegate.swift in Sources */,
 				E027F56C26A8A9CD007DB7B3 /* APIRequest.swift in Sources */,
 				E027F55E26A878DF007DB7B3 /* Coordinator.swift in Sources */,

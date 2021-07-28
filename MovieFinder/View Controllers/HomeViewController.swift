@@ -18,24 +18,8 @@ class HomeViewController: UIViewController, HomeViewControllerProtocol {
         static let cellIdentifier = "movieCellIdentifier"
     }
     
-    private let _searchController: UISearchController = {
-        let searchController = UISearchController(searchResultsController: nil)
-        searchController.searchBar.placeholder = "Search for movies"
-        searchController.searchBar.returnKeyType = .done
-        searchController.obscuresBackgroundDuringPresentation = false
-        return searchController
-    }()
-    
-    private let _tableView: UITableView = {
-        let tableView = UITableView()
-        tableView.register(MovieTableViewCell.self,
-                           forCellReuseIdentifier: Constants.cellIdentifier)
-        tableView.rowHeight = 85
-        tableView.keyboardDismissMode = .onDrag
-        return tableView
-        
-    }()
-    
+    private let _searchController = UISearchController(searchResultsController: nil)
+    private let _tableView = UITableView()
     private let _homeViewModel : HomeViewModelProtocol
     private let _disposeBag = DisposeBag()
 
@@ -56,8 +40,7 @@ class HomeViewController: UIViewController, HomeViewControllerProtocol {
         super.viewDidLoad()
         configureProperties()
         configureLayout()
-        configureSearch()
-        configureObservers()
+        configureRx()
     }
     
     private func configureProperties() {
@@ -66,8 +49,19 @@ class HomeViewController: UIViewController, HomeViewControllerProtocol {
         navigationController?.navigationBar.prefersLargeTitles = true
         
         //search
+        _searchController.searchBar.placeholder = "Search for movies"
+        _searchController.searchBar.returnKeyType = .done
+        _searchController.obscuresBackgroundDuringPresentation = false
         navigationItem.searchController = _searchController
         navigationItem.hidesSearchBarWhenScrolling = false
+        
+        //table
+        _tableView.register(MovieTableViewCell.self,
+                           forCellReuseIdentifier: Constants.cellIdentifier)
+        _tableView.rowHeight = 140
+        _tableView.keyboardDismissMode = .onDrag
+        _tableView.tableFooterView = UIView()
+        _tableView.separatorStyle = .none
     }
     
     private func configureLayout() {
@@ -82,7 +76,7 @@ class HomeViewController: UIViewController, HomeViewControllerProtocol {
         _tableView.contentInset.bottom = view.safeAreaInsets.bottom
     }
     
-    private func configureSearch() {
+    private func configureRx() {
         _searchController.searchBar.rx.text.asObservable()
             .map { ($0 ?? "").lowercased() }
             .bind(to: _homeViewModel.searchObserver)
@@ -94,11 +88,15 @@ class HomeViewController: UIViewController, HomeViewControllerProtocol {
             })
             .bind(to: _homeViewModel.willDisplayItemObserver)
             .disposed(by: _disposeBag)
-    }
-    
-    private func configureObservers() {
+        
+        _homeViewModel.isLoadingDriver
+            .drive(onNext: { [unowned self] isLoading in
+                _searchController.searchBar.isLoading = isLoading
+            })
+            .disposed(by: _disposeBag)
+        
         _homeViewModel.contentDriver.drive(_tableView.rx.items(cellIdentifier: Constants.cellIdentifier)) {
-            (index, model: MovieCellModel, cell: MovieTableViewCell) in
+            (index, model: MovieSearchResult, cell: MovieTableViewCell) in
             cell.configure(model: model)
         }
         .disposed(by: _disposeBag)

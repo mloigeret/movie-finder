@@ -11,4 +11,11 @@ struct MovieSearchResult: Codable {
     let title: String
     let overview: String
     let posterPath: String?
+    
+    var fullPosterPath: String? {
+        get {
+            guard let posterPath = posterPath else { return nil }
+            return Configuration.tmdb.imgBaseUrl + posterPath
+        }
+    }
 }
