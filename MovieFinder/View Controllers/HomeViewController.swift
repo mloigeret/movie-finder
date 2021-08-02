@@ -57,7 +57,7 @@ class HomeViewController: UIViewController, HomeViewControllerProtocol {
         
         //table
         _tableView.register(MovieTableViewCell.self,
-                           forCellReuseIdentifier: Constants.cellIdentifier)
+                            forCellReuseIdentifier: Constants.cellIdentifier)
         _tableView.rowHeight = 140
         _tableView.keyboardDismissMode = .onDrag
         _tableView.tableFooterView = UIView()

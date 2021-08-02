@@ -13,6 +13,7 @@ protocol AppCordinatorProtocol: Coordinator {
 
 class AppCoordinator: AppCordinatorProtocol {
     private let _window: UIWindow
+    private var _navigationController: UINavigationController?
     private let _disposeBag = DisposeBag()
     
     static func instantiate(window: UIWindow) -> AppCordinatorProtocol {
@@ -34,12 +35,14 @@ class AppCoordinator: AppCordinatorProtocol {
         let homeViewController = HomeViewController.instantiate(viewModel: homeViewModel)
         let navigationController = UINavigationController(rootViewController: homeViewController)
         navigationController.view.backgroundColor = .white
+        _navigationController = navigationController
         _window.rootViewController = navigationController
-        _window.makeKeyAndVisible() 
+        _window.makeKeyAndVisible()
     }
     
     private func showDetailsViewController(movieSearchResult: MovieSearchResult) {
-        print("alright I guess I will show the details for movie \(movieSearchResult.title)")
-        //continue here
+        let movieVM = MovieViewModel.instantiate(movieSearchResult: movieSearchResult)
+        let movieVC = MovieViewController.instantiate(movieViewModel: movieVM)
+        _navigationController?.show(movieVC, sender: nil)
     }
 }
