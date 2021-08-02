@@ -20,11 +20,12 @@ protocol HomeViewModelProtocol {
 
 class HomeViewModel: HomeViewModelProtocol {
     
+    private let _apiService: APIServiceProtocol
+    
     private var _lastSearchedText: String? = nil
     private var _currentPage = 1
     private var _couldFetchMoreResults = true
-    
-    private let _apiService = APIService()
+
     private let _disposeBag = DisposeBag()
     
     private let _searchSubject = PublishSubject<String>()
@@ -59,11 +60,12 @@ class HomeViewModel: HomeViewModelProtocol {
         return _requestDetails.asObservable()
     }
     
-    static func instantiate() -> HomeViewModelProtocol {
-        return HomeViewModel()
+    static func instantiate(apiService: APIServiceProtocol) -> HomeViewModelProtocol {
+        return HomeViewModel(apiService: apiService)
     }
     
-    init() {
+    init(apiService: APIServiceProtocol) {
+        _apiService = apiService
         _searchSubject
             .asObservable()
             .filter { !$0.isEmpty }

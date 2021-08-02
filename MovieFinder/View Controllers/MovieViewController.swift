@@ -16,7 +16,7 @@ class MovieViewController: UIViewController, MovieViewControllerProtocol {
     private let _scrollView = UIScrollView()
     private let _scrollViewContent = UIView()
     private let _movieDetailsView = MovieDetailsView()
-    private let _castContainer = UIView()
+    private let _similarCollectionView = UICollectionView()
     
     private let _movieViewModel: MovieViewModelProtocol
     private let _disposeBag = DisposeBag()
@@ -48,19 +48,19 @@ class MovieViewController: UIViewController, MovieViewControllerProtocol {
         //background
         view.backgroundColor = .red
         _movieDetailsView.backgroundColor = .blue
-        _castContainer.backgroundColor = .green
+        _similarCollectionView.backgroundColor = .green
     }
     
     private func configureLayout() {
         _scrollView.translatesAutoresizingMaskIntoConstraints = false
         _scrollViewContent.translatesAutoresizingMaskIntoConstraints = false
         _movieDetailsView.translatesAutoresizingMaskIntoConstraints = false
-        _castContainer.translatesAutoresizingMaskIntoConstraints = false
+        _similarCollectionView.translatesAutoresizingMaskIntoConstraints = false
         
         view.addSubview(_scrollView)
         _scrollView.addSubview(_scrollViewContent)
         _scrollViewContent.addSubview(_movieDetailsView)
-        _scrollViewContent.addSubview(_castContainer)
+        _scrollViewContent.addSubview(_similarCollectionView)
         
         let scrollViewContentHeightConstraint = _scrollViewContent.heightAnchor.constraint(greaterThanOrEqualTo: _scrollView.heightAnchor)
         scrollViewContentHeightConstraint.priority = .defaultLow
@@ -83,18 +83,18 @@ class MovieViewController: UIViewController, MovieViewControllerProtocol {
             _movieDetailsView.rightAnchor.constraint(equalTo: _scrollViewContent.rightAnchor),
             _movieDetailsView.heightAnchor.constraint(equalToConstant: 300),
             
-            _castContainer.topAnchor.constraint(equalTo: _movieDetailsView.bottomAnchor),
-            _castContainer.leftAnchor.constraint(equalTo: _scrollViewContent.leftAnchor),
-            _castContainer.rightAnchor.constraint(equalTo: _scrollViewContent.rightAnchor),
-            _castContainer.bottomAnchor.constraint(equalTo: _scrollViewContent.bottomAnchor),
-            _castContainer.heightAnchor.constraint(equalToConstant: 300)
+            _similarCollectionView.topAnchor.constraint(equalTo: _movieDetailsView.bottomAnchor),
+            _similarCollectionView.leftAnchor.constraint(equalTo: _scrollViewContent.leftAnchor),
+            _similarCollectionView.rightAnchor.constraint(equalTo: _scrollViewContent.rightAnchor),
+            _similarCollectionView.bottomAnchor.constraint(equalTo: _scrollViewContent.bottomAnchor),
+            _similarCollectionView.heightAnchor.constraint(equalToConstant: 300)
         ])
     }
     
     private func configureRx() {
-        _movieViewModel.contentDriver.drive { [unowned self]  movieSearchResult in
-            title = movieSearchResult.title
-            _movieDetailsView.configure(model: movieSearchResult)
+        _movieViewModel.details.drive { [unowned self]  movieDetails in
+            title = movieDetails.title
+            _movieDetailsView.configure(model: movieDetails)
         }
         .disposed(by: _disposeBag)
     }

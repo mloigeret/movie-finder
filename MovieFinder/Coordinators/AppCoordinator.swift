@@ -14,6 +14,7 @@ protocol AppCordinatorProtocol: Coordinator {
 class AppCoordinator: AppCordinatorProtocol {
     private let _window: UIWindow
     private var _navigationController: UINavigationController?
+    private let _apiService: APIServiceProtocol = APIService.instantiate()
     private let _disposeBag = DisposeBag()
     
     static func instantiate(window: UIWindow) -> AppCordinatorProtocol {
@@ -25,7 +26,7 @@ class AppCoordinator: AppCordinatorProtocol {
     }
     
     func start() {
-        let homeViewModel = HomeViewModel.instantiate()
+        let homeViewModel = HomeViewModel.instantiate(apiService: _apiService)
         homeViewModel.requestDetailsObservable
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [unowned self] movieSearchResult in
@@ -41,7 +42,7 @@ class AppCoordinator: AppCordinatorProtocol {
     }
     
     private func showDetailsViewController(movieSearchResult: MovieSearchResult) {
-        let movieVM = MovieViewModel.instantiate(movieSearchResult: movieSearchResult)
+        let movieVM = MovieViewModel.instantiate(movieSearchResult: movieSearchResult, apiService: _apiService)
         let movieVC = MovieViewController.instantiate(movieViewModel: movieVM)
         _navigationController?.show(movieVC, sender: nil)
     }
