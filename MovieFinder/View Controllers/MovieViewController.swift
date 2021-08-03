@@ -126,5 +126,12 @@ class MovieViewController: UIViewController, MovieViewControllerProtocol {
             cell.configure(movieSearchResult: model)
         }
         .disposed(by: _disposeBag)
+        
+        _similarCollectionView.rx.willDisplayCell
+            .flatMap ({ cell, indexPath in
+                return Observable.just(indexPath.row)
+            })
+            .bind(to: _movieViewModel.willDisplaySimilarItemObserver)
+            .disposed(by: _disposeBag)
     }
 }

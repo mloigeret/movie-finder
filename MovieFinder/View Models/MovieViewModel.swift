@@ -12,17 +12,25 @@ import RxCocoa
 protocol MovieViewModelProtocol {
     var detailsDriver: Driver<MovieDetails> { get }
     var similarMoviesDriver: Driver<[MovieSearchResult]> { get }
+    var willDisplaySimilarItemObserver: AnyObserver<Int> { get }
 }
 
 class MovieViewModel: MovieViewModelProtocol {
     private let _movieSearchResult: MovieSearchResult
     private let _apiService: APIServiceProtocol
     
+    private var _currentPage = 1
+    private var _isLoadingSimilars: Bool = false
+    private var _couldFetchMoreSimilars: Bool = true
+    
     private let _detailsRelay: BehaviorRelay<MovieDetails>
     var detailsDriver: Driver<MovieDetails>
     
     private let _similarMoviesRelay: BehaviorRelay<[MovieSearchResult]>
     var similarMoviesDriver: Driver<[MovieSearchResult]>
+    
+    private let _willDisplaySimilarItemSubject: PublishSubject<Int>
+    var willDisplaySimilarItemObserver: AnyObserver<Int>
     
     private let _disposeBag = DisposeBag()
 
@@ -44,8 +52,12 @@ class MovieViewModel: MovieViewModelProtocol {
         _similarMoviesRelay = BehaviorRelay<[MovieSearchResult]>(value: [])
         similarMoviesDriver = _similarMoviesRelay.asDriver()
         
+        _willDisplaySimilarItemSubject = PublishSubject<Int>()
+        willDisplaySimilarItemObserver = _willDisplaySimilarItemSubject.asObserver()
+        
         loadCredits()
         loadSimilarMovies()
+        
     }
     
     private func loadCredits() {
@@ -61,14 +73,42 @@ class MovieViewModel: MovieViewModelProtocol {
     }
     
     private func loadSimilarMovies() {
-        let request = SimilarMoviesRequest(movieId: _movieSearchResult.id)
+        _isLoadingSimilars = true
+        let request = SimilarMoviesRequest(movieId: _movieSearchResult.id,
+                                           page: _currentPage)
         let query = _apiService.send(apiRequest: request) as Observable<QueryListResult<MovieSearchResult>>
         query.subscribe(onNext: { [unowned self] result in
             for m in result.results {
                 print(m.title)
             }
             _similarMoviesRelay.accept(result.results)
+            _isLoadingSimilars = false
         })
         .disposed(by: _disposeBag)
+        
+        //subscribe to _willDisplaySimilarItemSubject for pagination
+        _willDisplaySimilarItemSubject
+            .asObservable()
+            .distinctUntilChanged()
+            .filter { [unowned self] itemIndex in
+                _isLoadingSimilars == false &&
+                    itemIndex >= _similarMoviesRelay.value.count-5 &&
+                    _couldFetchMoreSimilars
+            }
+            .flatMapLatest { [unowned self] _ -> Observable<QueryListResult<MovieSearchResult>> in
+                _isLoadingSimilars = true
+                _currentPage += 1
+                let request = SimilarMoviesRequest(movieId: _movieSearchResult.id,
+                                                   page: _currentPage)
+                return _apiService.send(apiRequest: request)
+            }
+            .subscribe (onNext: { [unowned self] result in
+                if result.results.count == 0 {
+                    _couldFetchMoreSimilars = false
+                }
+                _similarMoviesRelay.accept(_similarMoviesRelay.value + result.results)
+                _isLoadingSimilars = false
+            })
+            .disposed(by: _disposeBag)
     }
 }

@@ -18,8 +18,9 @@ class SimilarMoviesRequest: APIRequest {
         }
     }
     
-    init(movieId: Int) {
+    init(movieId: Int, page: Int) {
         _movieId = movieId
         parameters["api_key"] = Configuration.tmdb.apiKey
+        parameters["page"] = String(page)
     }
 }
