@@ -133,5 +133,12 @@ class MovieViewController: UIViewController, MovieViewControllerProtocol {
             })
             .bind(to: _movieViewModel.willDisplaySimilarItemObserver)
             .disposed(by: _disposeBag)
+        
+        _similarCollectionView.rx.itemSelected
+            .flatMap({ indexPath in
+                return Observable.just(indexPath.row)
+            })
+            .bind(to: _movieViewModel.didSelectSimilarObserver)
+            .disposed(by: _disposeBag)
     }
 }

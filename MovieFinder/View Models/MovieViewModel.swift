@@ -13,6 +13,8 @@ protocol MovieViewModelProtocol {
     var detailsDriver: Driver<MovieDetails> { get }
     var similarMoviesDriver: Driver<[MovieSearchResult]> { get }
     var willDisplaySimilarItemObserver: AnyObserver<Int> { get }
+    var didSelectSimilarObserver: AnyObserver<Int> { get }
+    var requestDetailsObservable: Observable<MovieSearchResult> { get }
 }
 
 class MovieViewModel: MovieViewModelProtocol {
@@ -31,6 +33,12 @@ class MovieViewModel: MovieViewModelProtocol {
     
     private let _willDisplaySimilarItemSubject: PublishSubject<Int>
     var willDisplaySimilarItemObserver: AnyObserver<Int>
+    
+    private let _didSelectSimilarSubject: PublishSubject<Int>
+    var didSelectSimilarObserver: AnyObserver<Int>
+    
+    private let _requestDetailsSubject: PublishSubject<MovieSearchResult>
+    var requestDetailsObservable: Observable<MovieSearchResult>
     
     private let _disposeBag = DisposeBag()
 
@@ -54,6 +62,12 @@ class MovieViewModel: MovieViewModelProtocol {
         
         _willDisplaySimilarItemSubject = PublishSubject<Int>()
         willDisplaySimilarItemObserver = _willDisplaySimilarItemSubject.asObserver()
+        
+        _didSelectSimilarSubject = PublishSubject<Int>()
+        didSelectSimilarObserver = _didSelectSimilarSubject.asObserver()
+        
+        _requestDetailsSubject = PublishSubject<MovieSearchResult>()
+        requestDetailsObservable = _requestDetailsSubject.asObservable()
         
         loadCredits()
         loadSimilarMovies()
@@ -109,6 +123,14 @@ class MovieViewModel: MovieViewModelProtocol {
                 _similarMoviesRelay.accept(_similarMoviesRelay.value + result.results)
                 _isLoadingSimilars = false
             })
+            .disposed(by: _disposeBag)
+        
+        _didSelectSimilarSubject
+            .asObservable()
+            .flatMapLatest { [unowned self] index -> Observable<MovieSearchResult> in
+                return Observable.of(_similarMoviesRelay.value[index])
+            }
+            .bind(to: _requestDetailsSubject)
             .disposed(by: _disposeBag)
     }
 }

@@ -27,12 +27,13 @@ class AppCoordinator: AppCordinatorProtocol {
     
     func start() {
         let homeViewModel = HomeViewModel.instantiate(apiService: _apiService)
-        homeViewModel.requestDetailsObservable
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [unowned self] movieSearchResult in
-                showDetailsViewController(movieSearchResult: movieSearchResult)
-            })
-            .disposed(by: _disposeBag)
+        subscribeToDetails(observable: homeViewModel.requestDetailsObservable)
+//        homeViewModel.requestDetailsObservable
+//            .observe(on: MainScheduler.instance)
+//            .subscribe(onNext: { [unowned self] movieSearchResult in
+//                showDetailsViewController(movieSearchResult: movieSearchResult)
+//            })
+//            .disposed(by: _disposeBag)
         let homeViewController = HomeViewController.instantiate(viewModel: homeViewModel)
         let navigationController = UINavigationController(rootViewController: homeViewController)
         navigationController.view.backgroundColor = .white
@@ -43,7 +44,17 @@ class AppCoordinator: AppCordinatorProtocol {
     
     private func showDetailsViewController(movieSearchResult: MovieSearchResult) {
         let movieVM = MovieViewModel.instantiate(movieSearchResult: movieSearchResult, apiService: _apiService)
+        subscribeToDetails(observable: movieVM.requestDetailsObservable)
         let movieVC = MovieViewController.instantiate(movieViewModel: movieVM)
         _navigationController?.show(movieVC, sender: nil)
+    }
+    
+    private func subscribeToDetails(observable: Observable<MovieSearchResult>) {
+        observable
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [unowned self] movieSearchResult in
+                showDetailsViewController(movieSearchResult: movieSearchResult)
+            })
+            .disposed(by: _disposeBag)
     }
 }
