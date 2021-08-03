@@ -12,6 +12,7 @@ class MovieTableViewCell: UITableViewCell {
     private struct Constants {
         static let containerPadding: CGFloat = 5
         static let padding: CGFloat = 5
+        static let placeholderImage = UIImage(systemName: "film")?.withRenderingMode(.alwaysTemplate)
     }
     
     private var _isSetup: Bool = false
@@ -29,8 +30,11 @@ class MovieTableViewCell: UITableViewCell {
     private func setupIfNecessary() {
         guard !_isSetup else { return }
         _isSetup = true
-        
-        //components
+        setupComponents()
+        setupLayout()
+    }
+    
+    private func setupComponents() {
         _containerView.layer.cornerRadius = 8
         _containerView.clipsToBounds = true
         _containerView.backgroundColor = .lightGray
@@ -41,8 +45,11 @@ class MovieTableViewCell: UITableViewCell {
         _overviewLabel.numberOfLines = 0
         _overviewLabel.lineBreakMode = .byWordWrapping
         
-        
-        //layout
+        _posterImv.tintColor = .white
+        _posterImv.contentMode = .scaleAspectFit
+    }
+    
+    private func setupLayout() {
         _containerView.translatesAutoresizingMaskIntoConstraints = false
         _posterImv.translatesAutoresizingMaskIntoConstraints = false
         _titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -76,14 +83,10 @@ class MovieTableViewCell: UITableViewCell {
     }
     
     func configure(model: MovieSearchResult) {
-        let placeholderImage = UIImage(systemName: "film")?.withRenderingMode(.alwaysTemplate)
         _titleLabel.text = model.title
         _overviewLabel.text = model.overview
-        _posterImv.tintColor = .white
-        _posterImv.contentMode = .scaleAspectFit
-        
         _posterImv.downloadImageFrom(urlString: model.fullPosterPath,
-                                     placeholder: placeholderImage,
+                                     placeholder: Constants.placeholderImage,
                                      imageMode: .scaleAspectFit)
     }
 }

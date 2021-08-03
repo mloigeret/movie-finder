@@ -71,7 +71,7 @@ class HomeViewModel: HomeViewModelProtocol {
             .filter { !$0.isEmpty }
             .distinctUntilChanged()
             .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
-            .flatMapLatest { [unowned self] text -> Observable<MovieSearchListResult> in
+            .flatMapLatest { [unowned self] text -> Observable<QueryListResult<MovieSearchResult>> in
                 _isLoadingRelay.accept(true)
                 _lastSearchedText = text
                 _currentPage = 1
@@ -104,7 +104,7 @@ class HomeViewModel: HomeViewModelProtocol {
                     !(self._lastSearchedText?.isEmpty ?? false) && // may be use an observable instead
                     _couldFetchMoreResults
             }
-            .flatMapLatest { [unowned self] _ -> Observable<MovieSearchListResult> in
+            .flatMapLatest { [unowned self] _ -> Observable<QueryListResult<MovieSearchResult>> in
                 _isLoadingRelay.accept(true)
                 _currentPage += 1
                 let request = MovieSearchRequest(query: self._lastSearchedText ?? "", page: self._currentPage)

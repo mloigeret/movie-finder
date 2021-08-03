@@ -12,11 +12,17 @@ protocol MovieViewControllerProtocol: UIViewController {
 }
 
 class MovieViewController: UIViewController, MovieViewControllerProtocol {
+    
+    private struct Constants {
+        static let cellIdentifier = "similarCellIdentifier"
+        static let collectionCellWidth: CGFloat = 150
+        static let collectionCellHeight: CGFloat = 300
+    }
 
     private let _scrollView = UIScrollView()
     private let _scrollViewContent = UIView()
     private let _movieDetailsView = MovieDetailsView()
-    private let _similarCollectionView = UICollectionView()
+    private let _similarCollectionView: UICollectionView
     
     private let _movieViewModel: MovieViewModelProtocol
     private let _disposeBag = DisposeBag()
@@ -25,8 +31,20 @@ class MovieViewController: UIViewController, MovieViewControllerProtocol {
         return MovieViewController(movieViewModel: movieViewModel)
     }
     
+    private static func setupFlowLayout() -> UICollectionViewFlowLayout {
+        let flowLayout = UICollectionViewFlowLayout()
+        flowLayout.itemSize = CGSize(width: Constants.collectionCellWidth,
+                                     height: Constants.collectionCellHeight)
+        flowLayout.sectionInset = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
+        flowLayout.scrollDirection = .horizontal
+        flowLayout.minimumInteritemSpacing = 0.0
+        return flowLayout
+    }
+    
     init(movieViewModel: MovieViewModelProtocol) {
         _movieViewModel = movieViewModel
+        _similarCollectionView = UICollectionView(frame: CGRect.zero,
+                                                  collectionViewLayout: MovieViewController.setupFlowLayout())
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -40,7 +58,7 @@ class MovieViewController: UIViewController, MovieViewControllerProtocol {
         configureLayout()
         configureRx()
     }
-    
+
     private func configureProperties() {
         //title
         navigationController?.navigationBar.prefersLargeTitles = true
@@ -49,6 +67,10 @@ class MovieViewController: UIViewController, MovieViewControllerProtocol {
         view.backgroundColor = .red
         _movieDetailsView.backgroundColor = .blue
         _similarCollectionView.backgroundColor = .green
+        
+        //collection
+        _similarCollectionView.register(SimilarCollectionViewCell.self,
+                                        forCellWithReuseIdentifier: Constants.cellIdentifier)
     }
     
     private func configureLayout() {
@@ -92,9 +114,16 @@ class MovieViewController: UIViewController, MovieViewControllerProtocol {
     }
     
     private func configureRx() {
-        _movieViewModel.details.drive { [unowned self]  movieDetails in
+        _movieViewModel.detailsDriver.drive { [unowned self]  movieDetails in
             title = movieDetails.title
             _movieDetailsView.configure(model: movieDetails)
+        }
+        .disposed(by: _disposeBag)
+        
+        
+        _movieViewModel.similarMoviesDriver.drive(_similarCollectionView.rx.items(cellIdentifier: Constants.cellIdentifier)) {
+            (index, model: MovieSearchResult, cell: SimilarCollectionViewCell) in
+            cell.configure(movieSearchResult: model)
         }
         .disposed(by: _disposeBag)
     }
