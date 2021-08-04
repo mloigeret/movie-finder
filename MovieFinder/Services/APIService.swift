@@ -10,7 +10,7 @@ import RxCocoa
 import RxSwift
 
 protocol APIServiceProtocol {
-    func send<T: Codable>(apiRequest: APIRequest) -> Observable<T>
+    func send<T: Decodable>(apiRequest: APIRequest) -> Observable<T>
 }
 
 class APIService: APIServiceProtocol {
@@ -22,7 +22,7 @@ class APIService: APIServiceProtocol {
         return APIService()
     }
     
-    func send<T: Codable>(apiRequest: APIRequest) -> Observable<T> {
+    func send<T: Decodable>(apiRequest: APIRequest) -> Observable<T> {
         let request = apiRequest.request(with: Constants.baseURL)
         return URLSession.shared.rx.data(request: request)
             .map { data in

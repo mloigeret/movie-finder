@@ -7,6 +7,6 @@
 
 import Foundation
 
-struct QueryListResult<T: Codable>: Codable {
+struct QueryListResult<T: Decodable>: Decodable {
     let results: [T]
 }

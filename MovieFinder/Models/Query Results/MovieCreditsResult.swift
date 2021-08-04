@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct MovieCreditsResult: Codable {
+struct MovieCreditsResult: Decodable {
     let cast: [CastMember]
     let crew: [CrewMember]
 }
