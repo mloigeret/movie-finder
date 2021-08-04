@@ -28,12 +28,6 @@ class AppCoordinator: AppCordinatorProtocol {
     func start() {
         let homeViewModel = HomeViewModel.instantiate(apiService: _apiService)
         subscribeToDetails(observable: homeViewModel.requestDetailsObservable)
-//        homeViewModel.requestDetailsObservable
-//            .observe(on: MainScheduler.instance)
-//            .subscribe(onNext: { [unowned self] movieSearchResult in
-//                showDetailsViewController(movieSearchResult: movieSearchResult)
-//            })
-//            .disposed(by: _disposeBag)
         let homeViewController = HomeViewController.instantiate(viewModel: homeViewModel)
         let navigationController = UINavigationController(rootViewController: homeViewController)
         navigationController.view.backgroundColor = .white
