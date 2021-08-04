@@ -21,44 +21,29 @@ protocol HomeViewModelProtocol {
 class HomeViewModel: HomeViewModelProtocol {
     
     private let _apiService: APIServiceProtocol
-    
-    private var _lastSearchedText: String? = nil
+
     private var _currentPage = 1
     private var _couldFetchMoreResults = true
 
     private let _disposeBag = DisposeBag()
     
-    private let _searchSubject = PublishSubject<String>()
-    var searchObserver: AnyObserver<String> {
-        return _searchSubject.asObserver()
-    }
+    private let _searchSubject: BehaviorSubject<String>
+    var searchObserver: AnyObserver<String>
 
-    private let _contentRelay = BehaviorRelay<[MovieSearchResult]>(value: [])
-    var contentDriver: Driver<[MovieSearchResult]> {
-        return _contentRelay
-            .asDriver(onErrorJustReturn: [])
-    }
+    private let _contentRelay: BehaviorRelay<[MovieSearchResult]>
+    var contentDriver: Driver<[MovieSearchResult]>
     
-    private let _isLoadingRelay = BehaviorRelay<Bool>(value: false)
-    var isLoadingDriver: Driver<Bool> {
-        return _isLoadingRelay
-            .asDriver(onErrorJustReturn: false)
-    }
+    private let _isLoadingRelay: BehaviorRelay<Bool>
+    var isLoadingDriver: Driver<Bool>
     
-    private let _willDisplayItemSubject = PublishSubject<Int>()
-    var willDisplayItemObserver: AnyObserver<Int> {
-        return _willDisplayItemSubject.asObserver()
-    }
+    private let _willDisplayItemSubject: PublishSubject<Int>
+    var willDisplayItemObserver: AnyObserver<Int>
     
-    private let _didSelectItemSubject = PublishSubject<Int>()
-    var didSelectItemObserver: AnyObserver<Int> {
-        return _didSelectItemSubject.asObserver()
-    }
+    private let _didSelectItemSubject: PublishSubject<Int>
+    var didSelectItemObserver: AnyObserver<Int>
     
-    private let _requestDetails = PublishSubject<MovieSearchResult>()
-    var requestDetailsObservable: Observable<MovieSearchResult> {
-        return _requestDetails.asObservable()
-    }
+    private let _requestDetailsSubject: PublishSubject<MovieSearchResult>
+    var requestDetailsObservable: Observable<MovieSearchResult>
     
     static func instantiate(apiService: APIServiceProtocol) -> HomeViewModelProtocol {
         return HomeViewModel(apiService: apiService)
@@ -66,6 +51,29 @@ class HomeViewModel: HomeViewModelProtocol {
     
     init(apiService: APIServiceProtocol) {
         _apiService = apiService
+        
+        _searchSubject = BehaviorSubject<String>(value: "")
+        searchObserver = _searchSubject.asObserver()
+        
+        _contentRelay = BehaviorRelay<[MovieSearchResult]>(value: [])
+        contentDriver = _contentRelay.asDriver()
+        
+        _isLoadingRelay = BehaviorRelay<Bool>(value: false)
+        isLoadingDriver = _isLoadingRelay.asDriver()
+        
+        _willDisplayItemSubject = PublishSubject<Int>()
+        willDisplayItemObserver = _willDisplayItemSubject.asObserver()
+        
+        _didSelectItemSubject = PublishSubject<Int>()
+        didSelectItemObserver = _didSelectItemSubject.asObserver()
+        
+        _requestDetailsSubject = PublishSubject<MovieSearchResult>()
+        requestDetailsObservable = _requestDetailsSubject.asObservable()
+        
+        setupRx()
+    }
+    
+    private func setupRx() {
         _searchSubject
             .asObservable()
             .filter { !$0.isEmpty }
@@ -73,7 +81,6 @@ class HomeViewModel: HomeViewModelProtocol {
             .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
             .flatMapLatest { [unowned self] text -> Observable<QueryListResult<MovieSearchResult>> in
                 _isLoadingRelay.accept(true)
-                _lastSearchedText = text
                 _currentPage = 1
                 _couldFetchMoreResults = true
                 
@@ -101,13 +108,14 @@ class HomeViewModel: HomeViewModelProtocol {
             .filter { [unowned self] itemIndex in
                 _isLoadingRelay.value == false &&
                     itemIndex >= _contentRelay.value.count-5 &&
-                    !(self._lastSearchedText?.isEmpty ?? false) && // may be use an observable instead
+                    !((try? _searchSubject.value().isEmpty) ?? false) &&
                     _couldFetchMoreResults
             }
             .flatMapLatest { [unowned self] _ -> Observable<QueryListResult<MovieSearchResult>> in
                 _isLoadingRelay.accept(true)
                 _currentPage += 1
-                let request = MovieSearchRequest(query: self._lastSearchedText ?? "", page: self._currentPage)
+                let request = MovieSearchRequest(query: (try? _searchSubject.value()) ?? "",
+                                                 page: self._currentPage)
                 return _apiService.send(apiRequest: request)
             }
             .subscribe(onNext: { [unowned self] searchResult in
@@ -124,7 +132,7 @@ class HomeViewModel: HomeViewModelProtocol {
             .flatMapLatest { [unowned self] index -> Observable<MovieSearchResult> in
                 return Observable.of(_contentRelay.value[index])
             }
-            .bind(to: _requestDetails)
+            .bind(to: _requestDetailsSubject)
             .disposed(by: _disposeBag)
     }
 }

@@ -64,9 +64,9 @@ class MovieViewController: UIViewController, MovieViewControllerProtocol {
         navigationController?.navigationBar.prefersLargeTitles = true
         
         //background
-        view.backgroundColor = .red
-        _movieDetailsView.backgroundColor = .blue
-        _similarCollectionView.backgroundColor = .green
+        view.backgroundColor = .white
+        _movieDetailsView.backgroundColor = .white
+        _similarCollectionView.backgroundColor = .lightGray
         
         //collection
         _similarCollectionView.register(SimilarCollectionViewCell.self,
