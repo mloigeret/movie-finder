@@ -10,9 +10,8 @@ import RxSwift
 
 class UIDownloadableImageView: UIView {
     private let _imv = UIImageView()
-    private let _imageCache = NSCache<NSString, AnyObject>()
     private let _imageURLObservable = BehaviorSubject<URL?>(value: nil)
-    
+
     private let _disposeBag = DisposeBag()
     
     init() {
@@ -39,15 +38,18 @@ class UIDownloadableImageView: UIView {
     
     private func configureRx() {
         _imageURLObservable
-            .flatMapLatest { url -> Observable<Data>  in
-                guard let url = url else { return Observable.of(Data.init()) }
+            .flatMapLatest { url -> Observable<(Data,URL?)>  in
+                guard let url = url else { return Observable.of((Data.init(), url)) }
                 let request = URLRequest.init(url: url)
-                return URLSession.shared.rx.data(request: request)
+                return Observable.combineLatest(URLSession.shared.rx.data(request: request), Observable.of(url)) { data, url in
+                    return (data,url)
+                }
             }
             .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [unowned self] data in
-                guard let img = UIImage(data: data) else { return }
+            .subscribe(onNext: { [unowned self] (data, url) in
+                guard let img = UIImage(data: data), let url = url else { return }
                 _imv.image = img
+                ImageCache.shared.save(image: img, forKey: url.absoluteString)
             })
             .disposed(by: _disposeBag)
     }
@@ -67,7 +69,7 @@ class UIDownloadableImageView: UIView {
                            imageMode: UIView.ContentMode) {
         _imv.image = placeholder
         contentMode = imageMode
-        if let cachedImage = _imageCache.object(forKey: url.absoluteString as NSString) as? UIImage {
+        if let cachedImage = ImageCache.shared.image(forKey: url.absoluteString) {
             _imv.image = cachedImage
         }
         else {

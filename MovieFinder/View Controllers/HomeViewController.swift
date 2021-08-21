@@ -9,17 +9,16 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-protocol HomeViewControllerProtocol: UIViewController {
+protocol HomeViewControllerProtocol: UITableViewController {
 }
 
-class HomeViewController: UIViewController, HomeViewControllerProtocol {
+class HomeViewController: UITableViewController, HomeViewControllerProtocol {
 
     private struct Constants {
         static let cellIdentifier = "movieCellIdentifier"
     }
     
     private let _searchController = UISearchController(searchResultsController: nil)
-    private let _tableView = UITableView()
     private let _homeViewModel : HomeViewModelProtocol
     private let _disposeBag = DisposeBag()
 
@@ -39,7 +38,6 @@ class HomeViewController: UIViewController, HomeViewControllerProtocol {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureProperties()
-        configureLayout()
         configureRx()
     }
     
@@ -56,24 +54,14 @@ class HomeViewController: UIViewController, HomeViewControllerProtocol {
         navigationItem.hidesSearchBarWhenScrolling = false
         
         //table
-        _tableView.register(MovieTableViewCell.self,
+        tableView.register(MovieTableViewCell.self,
                             forCellReuseIdentifier: Constants.cellIdentifier)
-        _tableView.rowHeight = 140
-        _tableView.keyboardDismissMode = .onDrag
-        _tableView.tableFooterView = UIView()
-        _tableView.separatorStyle = .none
-    }
-    
-    private func configureLayout() {
-        _tableView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(_tableView)
-        NSLayoutConstraint.activate([
-            _tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            _tableView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
-            _tableView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
-            _tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
-        _tableView.contentInset.bottom = view.safeAreaInsets.bottom
+        tableView.dataSource = nil
+        tableView.delegate = nil
+        tableView.rowHeight = 140
+        tableView.keyboardDismissMode = .onDrag
+        tableView.tableFooterView = UIView()
+        tableView.separatorStyle = .none
     }
     
     private func configureRx() {
@@ -85,21 +73,21 @@ class HomeViewController: UIViewController, HomeViewControllerProtocol {
         _searchController.searchBar.rx.text.asObservable()
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [unowned self] _ in
-                _tableView.setContentOffset(.zero, animated: true)
+                tableView.setContentOffset(.zero, animated: true)
             })
             .disposed(by: _disposeBag)
         
-        _tableView.rx.willDisplayCell
+        tableView.rx.willDisplayCell
             .flatMap({ cell, indexPath -> Observable<Int> in
                 return Observable.just(indexPath.row)
             })
             .bind(to: _homeViewModel.willDisplayItemObserver)
             .disposed(by: _disposeBag)
         
-        _tableView.rx.itemSelected
+        tableView.rx.itemSelected
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [unowned self] indexPath in
-                _tableView.cellForRow(at: indexPath)?.isSelected = false
+                tableView.cellForRow(at: indexPath)?.isSelected = false
                 _homeViewModel.didSelectItemObserver.onNext(indexPath.row)
             })
             .disposed(by: _disposeBag)
@@ -110,9 +98,9 @@ class HomeViewController: UIViewController, HomeViewControllerProtocol {
             })
             .disposed(by: _disposeBag)
         
-        _homeViewModel.contentDriver.drive(_tableView.rx.items(cellIdentifier: Constants.cellIdentifier)) {
-            (index, model: MovieSearchResult, cell: MovieTableViewCell) in
-            cell.configure(model: model)
+        _homeViewModel.contentDriver.drive(tableView.rx.items(cellIdentifier: Constants.cellIdentifier)) {
+            (index, movie: MovieSearchResult, cell: MovieTableViewCell) in
+            cell.configure(movie: movie)
         }
         .disposed(by: _disposeBag)
     }

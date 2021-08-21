@@ -34,7 +34,6 @@ class SimilarCollectionViewCell: UICollectionViewCell {
     
     private func setupComponents() {
         _titleLabel.font = UIFont.boldSystemFont(ofSize: 16)
-        _titleLabel.textColor = .black
         _titleLabel.numberOfLines = 2
     }
     
